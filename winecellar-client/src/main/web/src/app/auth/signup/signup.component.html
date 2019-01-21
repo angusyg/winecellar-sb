@@ -1,0 +1,103 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4">
+      <div class="card">
+        <div class="card-body p-0">
+          <form (ngSubmit)="onSubmit()" [formGroup]="signupForm">
+            <h3 class="card-title ">Inscription</h3>
+            <div [appFormControlError]="signupForm.controls.login" class="form-group">
+              <label class="hovered-focused" for="pseudo">Pseudonyme</label>
+              <div class="inner-addon left-addon hovered-focused">
+                <i class="inner-icon hovered-focused fas fa-user"></i>
+                <input class="form-control" formControlName="login" id="pseudo" placeholder="Ton nom de joueur"
+                       type="text"/>
+              </div>
+            </div>
+            <div [appFormControlError]="signupForm.controls.email" class="form-group">
+              <label class="hovered-focused" for="email">Email</label>
+              <div class="inner-addon left-addon">
+                <i class="inner-icon hovered-focused fas fa-envelope"></i>
+                <input class="form-control" formControlName="email" id="email" placeholder="Ton mail de contact"
+                       type="email"/>
+                <span *ngIf="signupForm.controls.email.errors?.email" class="form-error">Format email non valide</span>
+              </div>
+            </div>
+            <div [appFormControlError]="signupForm.controls.password" [errors]="['passwordConfirmation']"
+                 [group]="signupForm" appFormGroupError class="form-group">
+              <label class="hovered-focused" for="password">Mot de passe</label>
+              <div class="inner-addon left-addon">
+                <i class="inner-icon hovered-focused fas fa-lock"></i>
+                <input class="form-control" formControlName="password" id="password" placeholder="Mot de passe"
+                       type="password"/>
+              </div>
+              <div class="inner-addon left-addon">
+                <i class="inner-icon hovered-focused fas fa-lock"></i>
+                <input
+                  class="form-control"
+                  formControlName="passwordConf"
+                  id="passwordConf"
+                  placeholder="Confirmation de mot de passe"
+                  type="password"
+                />
+                <span *ngIf="signupForm.errors?.passwordConfirmation">COnfig error</span>
+              </div>
+            </div>
+            <div *ngIf="signupInvitationCode === true" [appFormControlError]="signupForm.controls.invitationCode"
+                 class="form-group">
+              <label class="hovered-focused" for="invitationCode">Code d'invitation</label>
+              <div class="inner-addon left-addon">
+                <i class="inner-icon hovered-focused fas fa-envelope-open-text"></i>
+                <input class="form-control" formControlName="invitationCode" id="invitationCode"
+                       placeholder="Ton code d'invitation" type="text"/>
+              </div>
+            </div>
+            <div class="card-buttons">
+              <button class="btn btn-success w-100" type="submit">Inscription</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col d-none d-lg-block">
+      <div class="card tuto h-100">
+        <div class="card-body">
+          <h3 class="card-title">Le principe de Pronofoot Bet</h3>
+          <div>
+            <div class="row">
+              <span class="col">
+                <p class="text-justify">
+                  <img class="float-left mr-3" src="../../../assets/img/bet.jpg"/> Suis les côtes en direct et analyse les matchs de Ligue 1 de la
+                  semaine, afin de trouver les bons paris.
+                </p>
+              </span>
+            </div>
+            <div class="row">
+              <span class="col">
+                <p class="text-justify">
+                  <img class="float-left mr-3" src="../../../assets/img/grid.png"/> Remplis ta grille, en choisissant le résultat 1 N 2 ou en faisant
+                  des combos de plusieurs matchs et choisis le montant de ta bankroll que tu souhaites parier.
+                </p>
+              </span>
+            </div>
+            <div class="row">
+              <span class="col">
+                <p class="text-justify">
+                  <img class="float-left mr-3" src="../../../assets/img/defi.jpg"/> Défie un autre joueur à chaque journée. Le meilleur des deux sur
+                  la journée remporte la moitié des gains de l'autre.
+                </p>
+              </span>
+            </div>
+            <div class="row">
+              <span class="col">
+                <p class="text-justify">
+                  <img class="float-left mr-3" src="../../../assets/img/win.jpg"/> Bien joué nostradamus tu brilles au classement grâce a tes paris
+                  (ou grâce à la chatte à Dédé) !!!
+                </p>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

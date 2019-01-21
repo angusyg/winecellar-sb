@@ -1,0 +1,42 @@
+@import '../../../styles/components';
+
+.card {
+  padding: 1.25rem;
+
+  .card-body {
+    padding: 0;
+
+    form {
+      .btn {
+        width: 100%;
+      }
+    }
+
+    .card-buttons {
+      padding-top: 1.25rem;
+    }
+  }
+
+  &.tuto {
+
+    .card-title {
+      margin-bottom: 30px;
+    }
+
+    .col {
+      margin-bottom: 15px;
+      margin-top: 15px;
+    }
+
+    p {
+      font-size: 1.15rem;
+      font-weight: lighter;
+    }
+
+    img {
+      border: 2px solid #fff;
+      border-radius: .5rem;
+      width: 75px;
+    }
+  }
+}

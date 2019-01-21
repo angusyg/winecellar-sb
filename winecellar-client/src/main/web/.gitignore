@@ -1,0 +1,16 @@
+### Compiled output ###
+/dist
+/tmp
+/out-tsc
+
+### Installation ###
+/node
+
+### Dependencies ###
+/node_modules
+
+### Misc ###
+/.sass-cache
+/connect.lock
+/coverage
+/npm-debug.log
