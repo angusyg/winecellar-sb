@@ -1,27 +1,33 @@
-package com.angusyg.winecellar.model.entity;
+package com.angusyg.winecellar.user.entity;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 @Data
 @Entity(name = "USERS")
 public class User {
     @Id
     @GeneratedValue
-    private int id;
+    private Long id;
 
+    @NotNull
     @Column(unique = true, nullable = false)
     private String username;
 
+    @NotNull
     @Column(nullable = false)
     private String password;
 
+    @NotNull
     @Email
+    @Column(nullable = false)
     private String email;
+
+    @OneToMany
+    private Set<Role> roles;
 }
 
