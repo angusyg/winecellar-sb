@@ -1,10 +1,13 @@
 package com.angusyg.winecellar.core.model.controller;
 
+import com.angusyg.winecellar.core.model.exception.ModelException;
+import com.angusyg.winecellar.core.model.exception.NoResourceModelException;
+import com.angusyg.winecellar.core.model.service.ModelService;
+import com.angusyg.winecellar.core.model.web.arguments.Limiteable;
+import com.angusyg.winecellar.core.utils.MapperUtils;
 import com.angusyg.winecellar.core.web.controller.ApiController;
 import com.angusyg.winecellar.core.web.dto.ApiResponse;
 import com.angusyg.winecellar.core.web.dto.ErrorApiResponse;
-import com.angusyg.winecellar.core.model.service.ModelService;
-import com.angusyg.winecellar.core.model.web.arguments.Limiteable;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,40 +20,95 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+/**
+ * Model resource controller with default methods to handle REST resource operations
+ * Supported operations:
+ * <ul>
+ * <li>LIST resource (GET /)</li>
+ * <li>READ resource (GET /id)</li>
+ * </ul>
+ *
+ * @param <T>   resource type
+ * @param <ID>  resource id type
+ * @param <DTO> dto type to return
+ * @since 0.0.1
+ */
 public class ModelController<T, ID, DTO> extends ApiController {
-  private static final String NO_ENTITY_ERROR_CODE = "NO_ENTITY_ERROR";
-
+  // Entity to DTO mapper
   @Autowired
   private ModelMapper modelMapper;
 
+  // Model service accessing Dao resource
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private ModelService<T, ID> modelService;
 
+  /**
+   * Lists all resource elements
+   *
+   * @param pageable request page argument values
+   * @param limit    request limit argument value
+   * @param sort     request sort argument values
+   * @return a list of resource elements depending on request arguments
+   */
   @Transactional(readOnly = true)
   @GetMapping
   public ApiResponse findAll(Pageable pageable, Limiteable limit, Sort sort) {
+    // Retrieves entities
     Iterable<T> items = modelService.findAll(pageable, limit, sort);
-    Type listT = new TypeToken<Iterable<DTO>>() {}.getType();
-    return new ApiResponse(modelMapper.map(items, listT));
+    // Defines the mapping type of DTO (because type are removed on compilation)
+    //Type listT = new TypeToken<Iterable<DTO>>() {}.getType();
+    ParameterizedType genericTypes = (ParameterizedType) this.getClass().getGenericSuperclass();
+    // Maps entities to dto and returns an API response
+    return new ApiResponse(MapperUtils.mapAll(items, genericTypes.getActualTypeArguments()[2]));
   }
 
+  /**
+   * Retrieves resource element by its id
+   *
+   * @param id id of resource to retrieve
+   * @return a resource element
+   * @throws NoResourceModelException when no resource element found with id
+   */
   @Transactional(readOnly = true)
   @GetMapping("/{id}")
-  public ApiResponse findById(@PathVariable("id") ID id) {
+  public ApiResponse findById(@PathVariable("id") ID id) throws NoResourceModelException {
+    // Retrieves entity by its id
     T item = modelService.findById(id);
+    // Defines the mapping type of DTO (because type are removed on compilation)
     ParameterizedType genericTypes = (ParameterizedType) this.getClass().getGenericSuperclass();
-    return new ApiResponse(modelMapper.map(item, genericTypes.getActualTypeArguments()[2]));
+    // Maps entity to dto and returns an API response
+    return new ApiResponse(MapperUtils.map(item, genericTypes.getActualTypeArguments()[2]));
   }
 
-  @ExceptionHandler(NoResultException.class)
+  /**
+   * Handles {@link NoResourceModelException} thrown when no resource element were found
+   * <b>Status code of response is {@code 404}</b>
+   * @param req request
+   * @param ex {@link NoResourceModelException} thrown
+   * @return an api error response with {@link NoResourceModelException#getCode()} error code
+   */
+  @ExceptionHandler(NoResourceModelException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  public ErrorApiResponse handleNoResultException(HttpServletRequest req, Exception ex) {
-    return new ErrorApiResponse(NO_ENTITY_ERROR_CODE, req);
+  public ErrorApiResponse handleNoResourceModelException(HttpServletRequest req, NoResourceModelException ex) {
+    // Returns API error
+    return new ErrorApiResponse(ex);
+  }
+  /**
+   * Handles {@link ModelException} throw during resource access
+   * <b>Status code of response is {@code 500}</b>
+   * @param req request
+   * @param ex {@link ModelException} thrown
+   * @return an api error response with {@link ModelException#getCode()} error code
+   */
+  @ExceptionHandler(ModelException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ErrorApiResponse handleModelException(HttpServletRequest req, ModelException ex) {
+    // Returns API error
+    return new ErrorApiResponse(ex);
   }
 }

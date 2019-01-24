@@ -8,5 +8,4 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/users")
-public class UserController extends ModelController<User, Long, UserDto> {
-}
+public class UserController extends ModelController<User, Long, UserDto> {}

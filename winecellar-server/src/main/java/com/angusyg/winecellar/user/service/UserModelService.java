@@ -1,7 +1,8 @@
 package com.angusyg.winecellar.user.service;
 
-import com.angusyg.winecellar.user.entity.User;
 import com.angusyg.winecellar.core.model.service.ModelService;
+import com.angusyg.winecellar.user.entity.User;
+import org.springframework.stereotype.Service;
 
-public interface UserModelService extends ModelService<User, Long> {
-}
+@Service
+public class UserModelService extends ModelService<User, Long> {}
