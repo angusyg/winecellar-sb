@@ -8,8 +8,6 @@ import com.angusyg.winecellar.core.utils.MapperUtils;
 import com.angusyg.winecellar.core.web.controller.ApiController;
 import com.angusyg.winecellar.core.web.dto.ApiResponse;
 import com.angusyg.winecellar.core.web.dto.ErrorApiResponse;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -38,14 +37,23 @@ import java.lang.reflect.Type;
  * @since 0.0.1
  */
 public class ModelController<T, ID, DTO> extends ApiController {
-  // Entity to DTO mapper
-  @Autowired
-  private ModelMapper modelMapper;
-
   // Model service accessing Dao resource
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private ModelService<T, ID> modelService;
+
+  // Stores DTO type for mapper
+  private Type dtoType;
+
+  /**
+   * Retrieves DTO type from controller generics
+   * DTO type is used by model mapper
+   */
+  @PostConstruct
+  private void initDtoType() {
+    ParameterizedType genericTypes = (ParameterizedType) this.getClass().getGenericSuperclass();
+    this.dtoType = genericTypes.getActualTypeArguments()[2];
+  }
 
   /**
    * Lists all resource elements
@@ -60,11 +68,8 @@ public class ModelController<T, ID, DTO> extends ApiController {
   public ApiResponse findAll(Pageable pageable, Limiteable limit, Sort sort) {
     // Retrieves entities
     Iterable<T> items = modelService.findAll(pageable, limit, sort);
-    // Defines the mapping type of DTO (because type are removed on compilation)
-    //Type listT = new TypeToken<Iterable<DTO>>() {}.getType();
-    ParameterizedType genericTypes = (ParameterizedType) this.getClass().getGenericSuperclass();
     // Maps entities to dto and returns an API response
-    return new ApiResponse(MapperUtils.mapAll(items, genericTypes.getActualTypeArguments()[2]));
+    return new ApiResponse(MapperUtils.mapAll(items, this.dtoType));
   }
 
   /**
@@ -79,17 +84,16 @@ public class ModelController<T, ID, DTO> extends ApiController {
   public ApiResponse findById(@PathVariable("id") ID id) throws NoResourceModelException {
     // Retrieves entity by its id
     T item = modelService.findById(id);
-    // Defines the mapping type of DTO (because type are removed on compilation)
-    ParameterizedType genericTypes = (ParameterizedType) this.getClass().getGenericSuperclass();
     // Maps entity to dto and returns an API response
-    return new ApiResponse(MapperUtils.map(item, genericTypes.getActualTypeArguments()[2]));
+    return new ApiResponse(MapperUtils.map(item, this.dtoType));
   }
 
   /**
    * Handles {@link NoResourceModelException} thrown when no resource element were found
    * <b>Status code of response is {@code 404}</b>
+   *
    * @param req request
-   * @param ex {@link NoResourceModelException} thrown
+   * @param ex  {@link NoResourceModelException} thrown
    * @return an api error response with {@link NoResourceModelException#getCode()} error code
    */
   @ExceptionHandler(NoResourceModelException.class)
@@ -98,11 +102,13 @@ public class ModelController<T, ID, DTO> extends ApiController {
     // Returns API error
     return new ErrorApiResponse(ex);
   }
+
   /**
    * Handles {@link ModelException} throw during resource access
    * <b>Status code of response is {@code 500}</b>
+   *
    * @param req request
-   * @param ex {@link ModelException} thrown
+   * @param ex  {@link ModelException} thrown
    * @return an api error response with {@link ModelException#getCode()} error code
    */
   @ExceptionHandler(ModelException.class)

@@ -29,16 +29,6 @@ import java.util.stream.StreamSupport;
 @EnableSpringDataWebSupport // Adds Pageable and Sort argument resolvers
 public class ModelConfiguration {
   /**
-   * Creates an instance of {@link ModelMapper} to map entity to DTO
-   *
-   * @return a {@link ModelMapper} instance
-   */
-  @Bean
-  public ModelMapper modelMapper() {
-    return new ModelMapper();
-  }
-
-  /**
    * Creates a {@link PageableHandlerMethodArgumentResolverCustomizer} to set default {@link org.springframework.data.domain.Pageable} argument values
    *
    * @param pagesize default page size for page request
