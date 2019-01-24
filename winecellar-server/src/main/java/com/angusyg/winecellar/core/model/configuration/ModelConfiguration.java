@@ -11,18 +11,16 @@ import org.springframework.data.web.config.PageableHandlerMethodArgumentResolver
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * App Model configuration
  * <ul>
- *   <li>Creates a {@link ModelMapper} entity to DTO mapper</li>
- *   <li>Sets default {@link org.springframework.data.domain.Pageable} values</li>
- *   <li>Adds argument resolver for {@link com.angusyg.winecellar.core.model.web.arguments.Limiteable} argument</li>
+ * <li>Creates a {@link ModelMapper} entity to DTO mapper</li>
+ * <li>Sets default {@link org.springframework.data.domain.Pageable} values</li>
+ * <li>Adds argument resolver for {@link com.angusyg.winecellar.core.model.web.arguments.Limiteable} argument</li>
  * </ul>
+ *
  * @since 0.0.1
  */
 @Configuration

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
+
 @Slf4j
 public class ApiController {
   private static final String INTERNAL_ERROR_CODE = "INTERNAL_ERROR";
