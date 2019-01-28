@@ -1,0 +1,13 @@
+C:\Users\PB19258\Documents\Personnel\Code\winecellar\winecellar-server\winecellar-model\src\main\java\com\angusyg\winecellar\model\core\configuration\ModelConfiguration.java
+C:\Users\PB19258\Documents\Personnel\Code\winecellar\winecellar-server\winecellar-model\src\main\java\com\angusyg\winecellar\model\user\dto\UserDto.java
+C:\Users\PB19258\Documents\Personnel\Code\winecellar\winecellar-server\winecellar-model\src\main\java\com\angusyg\winecellar\model\user\service\UserModelService.java
+C:\Users\PB19258\Documents\Personnel\Code\winecellar\winecellar-server\winecellar-model\src\main\java\com\angusyg\winecellar\model\core\exception\NoResourceModelException.java
+C:\Users\PB19258\Documents\Personnel\Code\winecellar\winecellar-server\winecellar-model\src\main\java\com\angusyg\winecellar\model\user\entity\Role.java
+C:\Users\PB19258\Documents\Personnel\Code\winecellar\winecellar-server\winecellar-model\src\main\java\com\angusyg\winecellar\model\core\service\ModelService.java
+C:\Users\PB19258\Documents\Personnel\Code\winecellar\winecellar-server\winecellar-model\src\main\java\com\angusyg\winecellar\model\core\utils\MapperUtils.java
+C:\Users\PB19258\Documents\Personnel\Code\winecellar\winecellar-server\winecellar-model\src\main\java\com\angusyg\winecellar\model\user\dao\UserDao.java
+C:\Users\PB19258\Documents\Personnel\Code\winecellar\winecellar-server\winecellar-model\src\main\java\com\angusyg\winecellar\model\core\controller\ModelController.java
+C:\Users\PB19258\Documents\Personnel\Code\winecellar\winecellar-server\winecellar-model\src\main\java\com\angusyg\winecellar\model\user\entity\User.java
+C:\Users\PB19258\Documents\Personnel\Code\winecellar\winecellar-server\winecellar-model\src\main\java\com\angusyg\winecellar\model\core\web\arguments\Limiteable.java
+C:\Users\PB19258\Documents\Personnel\Code\winecellar\winecellar-server\winecellar-model\src\main\java\com\angusyg\winecellar\model\core\web\handler\LimitHandlerMethodArgumentResolver.java
+C:\Users\PB19258\Documents\Personnel\Code\winecellar\winecellar-server\winecellar-model\src\main\java\com\angusyg\winecellar\model\user\controller\UserController.java

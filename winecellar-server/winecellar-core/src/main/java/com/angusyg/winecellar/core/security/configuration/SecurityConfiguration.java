@@ -1,16 +1,20 @@
 package com.angusyg.winecellar.core.security.configuration;
 
+import com.angusyg.winecellar.core.security.jwt.filter.CustomBasicAuthenticationEntryPoint;
 import com.angusyg.winecellar.core.security.jwt.filter.JwtTokenAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -21,6 +25,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
     jsr250Enabled = true)
 public class SecurityConfiguration {
   @Bean
+  public BCryptPasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
+
+  @Bean
   @Profile("prod")
   public WebSecurityConfigurerAdapter prodSecurity() {
     return new WebSecurityConfigurerAdapter() {
@@ -29,6 +38,14 @@ public class SecurityConfiguration {
 
       @Autowired
       private JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter;
+
+      @Override
+      protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+      }
+
+      @Autowired
+      private UserDetailsService userDetailsService;
 
       @Override
       protected void configure(HttpSecurity http) throws Exception {
@@ -65,7 +82,8 @@ public class SecurityConfiguration {
             .csrf().disable()
             .headers().disable()
             .authorizeRequests()
-            .anyRequest().permitAll();
+            .anyRequest().authenticated()
+            .and().httpBasic().authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint());
       }
     };
   }
