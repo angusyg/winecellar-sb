@@ -15,21 +15,42 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+/**
+ * Authentication controller.
+ * Handles login and sign up.
+ *
+ * @since 0.0.1
+ */
 @Slf4j
 @RestController
 @RequestMapping("/auth")
 public class AuthController extends ApiController {
+  // Sign in error code (bad password or username)
   private static final String BAD_CREDENTIALS_ERROR_CODE = "BAD_CREDENTIALS";
 
   @Autowired
   private AuthService authService;
 
-  @PostMapping("/signup")
+  /**
+   * Login endpoint.
+   *
+   * @param loginDto login infos (username and password)
+   * @return an API response with JWT Token if ok
+   */
+  @PostMapping("/login")
   @Transactional(readOnly = true)
   public ApiResponse login(@Valid @RequestBody LoginDto loginDto) {
     return new ApiResponse(authService.login(loginDto));
   }
 
+  /**
+   * Handles bad credentials exceptions.
+   * Send a response with status 401 UNAUTHORIZED.
+   *
+   * @param req current request
+   * @param ex  bad credentials exception
+   * @return an API error
+   */
   @ExceptionHandler(BadCredentialsException.class)
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   public ErrorApiResponse handleBadCredentialsException(HttpServletRequest req, Exception ex) {

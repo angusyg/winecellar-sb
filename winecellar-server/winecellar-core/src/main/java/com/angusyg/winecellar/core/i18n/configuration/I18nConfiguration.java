@@ -6,13 +6,31 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.MessageSourceAccessor;
 
+/**
+ * Internationalization configuration.
+ *
+ * @since 0.0.1
+ */
 @Configuration
 public class I18nConfiguration {
+  /**
+   * Creates an instance of {@link MessageSource}
+   * It loads properties files containing messages and
+   * gives access to their values.
+   *
+   * @return an instance of {@link MessageSource}
+   */
   @Bean
   public MessageSource getMessageSource() {
     return new ClasspathReloadableResourceBundleMessageSource();
   }
 
+  /**
+   * Creates an instance of {@link MessageSourceAccessor}.
+   * Helper to easy access to {@link MessageSource}.
+   *
+   * @return an instance of {@link MessageSourceAccessor}
+   */
   @Bean
   public MessageSourceAccessor getMessageSourceAccessor() {
     return new MessageSourceAccessor(getMessageSource());

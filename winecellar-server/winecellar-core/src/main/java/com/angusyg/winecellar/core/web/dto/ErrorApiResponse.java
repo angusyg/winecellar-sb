@@ -2,6 +2,7 @@ package com.angusyg.winecellar.core.web.dto;
 
 import com.angusyg.winecellar.core.web.exception.ApiException;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
 
 /**
  * API error response to be serialized as JSON
@@ -20,13 +21,31 @@ public class ErrorApiResponse extends ApiResponse {
   private String message;
 
   /**
-   * Creates an {@link ErrorApiResponse} instance with default
-   * error code and specified data.
-   *
-   * @param data optional data
+   * Creates an {@link ErrorApiResponse} instance with default error code.
    */
-  public ErrorApiResponse(Object... data) {
+  public ErrorApiResponse() {
     this.code = INTERNAL_ERROR_CODE;
+  }
+
+  /**
+   * Creates an {@link ErrorApiResponse} instance from {@link HttpStatus}.
+   *
+   * @param status {@link HttpStatus to extract code from.
+   */
+  public ErrorApiResponse(HttpStatus status) {
+    this.code = status.name();
+  }
+
+  /**
+   * Creates an {@link ErrorApiResponse} instance from {@link HttpStatus}, message and data.
+   *
+   * @param status  {@link HttpStatus to extract code from.
+   * @param message message of error
+   * @param data    optional data
+   */
+  public ErrorApiResponse(HttpStatus status, String message, Object... data) {
+    this.code = status.name();
+    this.message = message;
     this.data = data.length > 0 ? data : null;
   }
 

@@ -11,6 +11,11 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Authentication service.
+ *
+ * @since 0.0.1
+ */
 @Service
 public class AuthService {
   @Autowired
@@ -28,7 +33,7 @@ public class AuthService {
   /**
    * Logs in a user with its username and password
    *
-   * @param loginDto log in infos
+   * @param loginDto login infos (username and password)
    * @return JWT Token as string
    */
   public String login(LoginDto loginDto) {

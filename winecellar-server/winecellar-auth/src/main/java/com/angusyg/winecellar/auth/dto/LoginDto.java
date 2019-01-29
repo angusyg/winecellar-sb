@@ -4,6 +4,11 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * Login DTO.
+ *
+ * @since 0.0.1
+ */
 @Data
 public class LoginDto {
   // User login username
