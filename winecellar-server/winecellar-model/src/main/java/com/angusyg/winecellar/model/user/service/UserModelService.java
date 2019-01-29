@@ -1,12 +1,10 @@
 package com.angusyg.winecellar.model.user.service;
 
 import com.angusyg.winecellar.model.core.service.ModelService;
-import com.angusyg.winecellar.model.user.dao.UserDao;
 import com.angusyg.winecellar.model.user.entity.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 
 /**
  * User resource service.
@@ -15,14 +13,14 @@ import org.springframework.stereotype.Service;
  * @since 0.0.1
  */
 @Service
-public class UserModelService extends ModelService<User, Long> implements UserDetailsService {
-  @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user = ((UserDao) repository).findByUsername(username);
-    if (user == null) {
-      throw new UsernameNotFoundException(String.format("No user found with username %s", username));
-    } else {
-      return user;
-    }
+public class UserModelService extends ModelService<User, Long> {
+  @PostConstruct
+  private void init() {
+    User u = new User();
+    u.setEmail("mail@email.com");
+    u.setUsername("admin");
+    u.setPassword("$2a$10$Qb2co9k7ADlXaOHdenIPbuOBVdJStqsgF3bR5k7yzYqFMgnHMIxDW");
+    u.setRoles("USER,ADMIN");
+    repository.save(u);
   }
 }

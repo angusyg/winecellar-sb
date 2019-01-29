@@ -1,2 +1,2 @@
-INSERT INTO users (id, username, password, email) VALUES (1, 'test', 'password', 'email@email.com');
-INSERT INTO users (id, username, password, email) VALUES (2, 'atest', 'password', 'email2@email.com');
+INSERT INTO USERS (ID, USERNAME, PASSWORD, EMAIL, ACCOUNT_NON_EXPIRED, ACCOUNT_NON_LOCKED, CREDENTIALS_NON_EXPIRED, ENABLED) VALUES (1000, 'test', '$2a$10$Qb2co9k7ADlXaOHdenIPbuOBVdJStqsgF3bR5k7yzYqFMgnHMIxDW', 'email@email.com', true, true, true, true);
+INSERT INTO USERS (ID, USERNAME, PASSWORD, EMAIL, ACCOUNT_NON_EXPIRED, ACCOUNT_NON_LOCKED, CREDENTIALS_NON_EXPIRED, ENABLED) VALUES (2000, 'atest', '$2a$10$Qb2co9k7ADlXaOHdenIPbuOBVdJStqsgF3bR5k7yzYqFMgnHMIxDW', 'email2@email.com', true, true, true, true);

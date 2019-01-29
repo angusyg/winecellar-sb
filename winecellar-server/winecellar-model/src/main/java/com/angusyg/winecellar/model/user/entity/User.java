@@ -12,7 +12,10 @@ import org.springframework.util.StringUtils;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -48,9 +51,9 @@ public class User implements UserDetails {
   @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
   @Cascade(value = CascadeType.REMOVE)
   @JoinTable(
-          indexes = {@Index(name = "INDEX_USER_ROLE", columnList = "id")},
-          name = "roles",
-          joinColumns = @JoinColumn(name = "id")
+      indexes = {@Index(name = "INDEX_USER_ROLE", columnList = "id")},
+      name = "roles",
+      joinColumns = @JoinColumn(name = "id")
   )
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
@@ -74,8 +77,20 @@ public class User implements UserDetails {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    String roles = StringUtils.collectionToCommaDelimitedString(this.roles.stream().map(Enum::name).collect(Collectors.toList()));
-    return AuthorityUtils.commaSeparatedStringToAuthorityList(roles);
+    return AuthorityUtils.commaSeparatedStringToAuthorityList(getRolesString());
+  }
+
+  public void setRoles(String roles) {
+    this.roles = Arrays.stream(roles.split(","))
+        .map((r) -> Enum.valueOf(Role.class, r))
+        .collect(Collectors.toSet());
+  }
+
+  public String getRolesString() {
+    return StringUtils.collectionToCommaDelimitedString(
+        this.roles.stream()
+            .map(Enum::name)
+            .collect(Collectors.toList()));
   }
 }
 

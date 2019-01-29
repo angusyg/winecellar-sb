@@ -1,4 +1,4 @@
-package com.angusyg.winecellar.core.security.jwt.dto;
+package com.angusyg.winecellar.auth.dto;
 
 import lombok.Data;
 

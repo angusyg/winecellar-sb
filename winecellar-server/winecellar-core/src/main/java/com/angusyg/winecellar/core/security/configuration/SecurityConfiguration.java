@@ -37,15 +37,15 @@ public class SecurityConfiguration {
       private JwtConfiguration jwtConfiguration;
 
       @Autowired
+      private UserDetailsService userDetailsService;
+
+      @Autowired
       private JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter;
 
       @Override
       protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
       }
-
-      @Autowired
-      private UserDetailsService userDetailsService;
 
       @Override
       protected void configure(HttpSecurity http) throws Exception {
@@ -82,8 +82,7 @@ public class SecurityConfiguration {
             .csrf().disable()
             .headers().disable()
             .authorizeRequests()
-            .anyRequest().authenticated()
-            .and().httpBasic().authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint());
+            .anyRequest().permitAll();
       }
     };
   }
