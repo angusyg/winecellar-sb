@@ -10,23 +10,23 @@ import lombok.Data;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ApiResponse {
+public class ResponseDTO {
   // Response data
   protected Object data;
 
   /**
-   * Creates an {@link ApiResponse} instance with no data
+   * Creates an {@link ResponseDTO} instance with no data
    */
-  public ApiResponse() {
+  public ResponseDTO() {
     this.data = null;
   }
 
   /**
-   * Creates {@link ApiResponse} instance with specified data
+   * Creates {@link ResponseDTO} instance with specified data
    *
    * @param data data to send in JSON response
    */
-  public ApiResponse(Object data) {
+  public ResponseDTO(Object data) {
     this.data = data;
   }
 }

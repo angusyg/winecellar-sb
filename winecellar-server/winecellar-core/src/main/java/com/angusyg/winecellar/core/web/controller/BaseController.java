@@ -1,7 +1,7 @@
 package com.angusyg.winecellar.core.web.controller;
 
-import com.angusyg.winecellar.core.web.dto.ErrorApiResponse;
-import com.angusyg.winecellar.core.web.validation.ValidationErrorDto;
+import com.angusyg.winecellar.core.web.dto.ErrorResponseDTO;
+import com.angusyg.winecellar.core.web.dto.ValidationErrorDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
@@ -34,7 +34,7 @@ import java.util.List;
  * @since 0.0.1
  */
 @Slf4j
-public class ApiController {
+public class BaseController {
   // Validation error code for API error response
   private static final String VALIDATION_ERROR_CODE = "VALIDATION_ERROR";
 
@@ -63,7 +63,7 @@ public class ApiController {
       NoHandlerFoundException.class,
       AsyncRequestTimeoutException.class
   })
-  public ResponseEntity<ErrorApiResponse> handleHttpError(Exception ex, HttpServletRequest request) throws Exception {
+  public ResponseEntity<ErrorResponseDTO> handleCommonExceptions(Exception ex, HttpServletRequest request) throws Exception {
     if (ex instanceof HttpRequestMethodNotSupportedException) {
       return handleInternalException(HttpStatus.METHOD_NOT_ALLOWED);
     } else if (ex instanceof HttpMediaTypeNotSupportedException) {
@@ -108,9 +108,9 @@ public class ApiController {
    * @return an API error response
    */
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<ErrorApiResponse> handleException(HttpServletRequest req, Exception ex) {
+  public ResponseEntity<ErrorResponseDTO> handleException(HttpServletRequest req, Exception ex) {
     log.error("Sending API error for uncaught exception: {}", ex.getMessage());
-    return new ResponseEntity<>(new ErrorApiResponse(), HttpStatus.INTERNAL_SERVER_ERROR);
+    return new ResponseEntity<>(new ErrorResponseDTO(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   /**
@@ -119,11 +119,11 @@ public class ApiController {
    * @param ex validation exception
    * @return an API error response
    */
-  private ResponseEntity<ErrorApiResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+  private ResponseEntity<ErrorResponseDTO> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
     BindingResult result = ex.getBindingResult();
     List<FieldError> fieldErrors = result.getFieldErrors();
-    ValidationErrorDto validationErrorDto = new ValidationErrorDto(fieldErrors);
-    return new ResponseEntity<>(new ErrorApiResponse(HttpStatus.BAD_REQUEST, VALIDATION_ERROR_CODE, validationErrorDto), HttpStatus.BAD_REQUEST);
+    ValidationErrorDTO validationErrorDto = new ValidationErrorDTO(fieldErrors);
+    return new ResponseEntity<>(new ErrorResponseDTO(HttpStatus.BAD_REQUEST, VALIDATION_ERROR_CODE, validationErrorDto), HttpStatus.BAD_REQUEST);
   }
 
   /**
@@ -132,7 +132,7 @@ public class ApiController {
    * @param status {@link HttpStatus} of response
    * @return an API error response
    */
-  private ResponseEntity<ErrorApiResponse> handleInternalException(HttpStatus status) {
-    return new ResponseEntity<>(new ErrorApiResponse(status), status);
+  private ResponseEntity<ErrorResponseDTO> handleInternalException(HttpStatus status) {
+    return new ResponseEntity<>(new ErrorResponseDTO(status), status);
   }
 }

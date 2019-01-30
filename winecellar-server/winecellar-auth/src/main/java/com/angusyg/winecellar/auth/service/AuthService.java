@@ -1,13 +1,13 @@
 package com.angusyg.winecellar.auth.service;
 
-import com.angusyg.winecellar.auth.dto.LoginDto;
+import com.angusyg.winecellar.auth.dto.LoginDTO;
+import com.angusyg.winecellar.auth.exception.BadCredentialsException;
 import com.angusyg.winecellar.core.security.jwt.JwtTokenPayload;
 import com.angusyg.winecellar.core.security.jwt.util.JwtUtils;
 import com.angusyg.winecellar.model.user.dao.UserDao;
 import com.angusyg.winecellar.model.user.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.MessageSourceAccessor;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +36,7 @@ public class AuthService {
    * @param loginDto login infos (username and password)
    * @return JWT Token as string
    */
-  public String login(LoginDto loginDto) {
+  public String login(LoginDTO loginDto) throws BadCredentialsException {
     // Gets user from repository by its username
     User user = userDao.findByUsername(loginDto.getUsername());
     if (user == null) {

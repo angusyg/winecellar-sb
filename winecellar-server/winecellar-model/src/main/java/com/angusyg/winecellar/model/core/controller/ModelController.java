@@ -4,9 +4,9 @@ import com.angusyg.winecellar.model.core.utils.MapperUtils;
 import com.angusyg.winecellar.model.core.exception.NoResourceModelException;
 import com.angusyg.winecellar.model.core.service.ModelService;
 import com.angusyg.winecellar.model.core.web.arguments.Limiteable;
-import com.angusyg.winecellar.core.web.controller.ApiController;
-import com.angusyg.winecellar.core.web.dto.ApiResponse;
-import com.angusyg.winecellar.core.web.dto.ErrorApiResponse;
+import com.angusyg.winecellar.core.web.controller.BaseController;
+import com.angusyg.winecellar.core.web.dto.ResponseDTO;
+import com.angusyg.winecellar.core.web.dto.ErrorResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -35,7 +35,7 @@ import java.lang.reflect.Type;
  * @param <DTO> DTO type to return
  * @since 0.0.1
  */
-public class ModelController<T, ID, DTO> extends ApiController {
+public class ModelController<T, ID, DTO> extends BaseController {
   // Model service accessing Dao resource
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
@@ -64,11 +64,11 @@ public class ModelController<T, ID, DTO> extends ApiController {
    */
   @Transactional(readOnly = true)
   @GetMapping
-  public ApiResponse findAll(Pageable pageable, Limiteable limit, Sort sort) {
+  public ResponseDTO findAll(Pageable pageable, Limiteable limit, Sort sort) {
     // Retrieves entities
     Iterable<T> items = modelService.findAll(pageable, limit, sort);
     // Maps entities to dto and returns an API response
-    return new ApiResponse(MapperUtils.mapAll(items, this.dtoType));
+    return new ResponseDTO(MapperUtils.mapAll(items, this.dtoType));
   }
 
   /**
@@ -80,11 +80,11 @@ public class ModelController<T, ID, DTO> extends ApiController {
    */
   @Transactional(readOnly = true)
   @GetMapping("/{id}")
-  public ApiResponse findById(@PathVariable("id") ID id) throws NoResourceModelException {
+  public ResponseDTO findById(@PathVariable("id") ID id) throws NoResourceModelException {
     // Retrieves entity by its id
     T item = modelService.findById(id);
     // Maps entity to dto and returns an API response
-    return new ApiResponse(MapperUtils.map(item, this.dtoType));
+    return new ResponseDTO(MapperUtils.map(item, this.dtoType));
   }
 
   /**
@@ -97,8 +97,8 @@ public class ModelController<T, ID, DTO> extends ApiController {
    */
   @ExceptionHandler(NoResourceModelException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  public ErrorApiResponse handleNoResourceModelException(HttpServletRequest req, NoResourceModelException ex) {
+  public ErrorResponseDTO handleNoResourceModelException(HttpServletRequest req, NoResourceModelException ex) {
     // Returns API error
-    return new ErrorApiResponse(ex);
+    return new ErrorResponseDTO(ex);
   }
 }

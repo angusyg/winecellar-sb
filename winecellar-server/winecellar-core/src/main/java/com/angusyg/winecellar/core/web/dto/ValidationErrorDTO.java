@@ -1,4 +1,4 @@
-package com.angusyg.winecellar.core.web.validation;
+package com.angusyg.winecellar.core.web.dto;
 
 import lombok.Data;
 import org.springframework.validation.FieldError;
@@ -12,17 +12,17 @@ import java.util.List;
  * @since 0.0.1
  */
 @Data
-public class ValidationErrorDto {
+public class ValidationErrorDTO {
   // Error on fields
   private List<FieldErrorDto> fieldErrors;
 
   /**
-   * Creates an instance of {@link ValidationErrorDto} from
+   * Creates an instance of {@link ValidationErrorDTO} from
    * fields validation errors.
    *
    * @param fieldErrors fields validation errors.
    */
-  public ValidationErrorDto(List<FieldError> fieldErrors) {
+  public ValidationErrorDTO(List<FieldError> fieldErrors) {
     this.fieldErrors = new ArrayList<>();
     for (FieldError fieldError : fieldErrors) {
       this.fieldErrors.add(new FieldErrorDto(fieldError));

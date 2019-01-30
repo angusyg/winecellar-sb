@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
  * @since 0.0.1
  */
 @Data
-public class LoginDto {
+public class LoginDTO {
   // User login username
   @NotNull
   private String username;
