@@ -1,5 +1,7 @@
 package com.angusyg.winecellar.core.web.controller;
 
+import com.angusyg.winecellar.core.exception.ApiException;
+import com.angusyg.winecellar.core.exception.ExceptionCode;
 import com.angusyg.winecellar.core.web.dto.ErrorResponseDTO;
 import com.angusyg.winecellar.core.web.dto.ValidationErrorDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +37,18 @@ import java.util.List;
  */
 @Slf4j
 public class BaseController {
-  // Validation error code for API error response
-  private static final String VALIDATION_ERROR_CODE = "VALIDATION_ERROR";
+  /**
+   * Handles duplicate data exceptions.
+   *
+   * @param req current request
+   * @param ex  bad credentials exception
+   * @return an API error
+   */
+  @ExceptionHandler(ApiException.class)
+  public ResponseEntity<ErrorResponseDTO> handleApiException(HttpServletRequest req, ApiException ex) {
+    log.error("Sending error for API Exception: {}", ex);
+    return responseEntityFromErrorResponseDTO(new ErrorResponseDTO(ex));
+  }
 
   /**
    * Handles multiple standard exceptions.
@@ -64,38 +76,39 @@ public class BaseController {
       AsyncRequestTimeoutException.class
   })
   public ResponseEntity<ErrorResponseDTO> handleCommonExceptions(Exception ex, HttpServletRequest request) throws Exception {
+    log.error("Sending error for {} exception: {}", ex.getClass(), ex);
     if (ex instanceof HttpRequestMethodNotSupportedException) {
-      return handleInternalException(HttpStatus.METHOD_NOT_ALLOWED);
+      return handleInternalException(ExceptionCode.METHOD_NOT_ALLOWED);
     } else if (ex instanceof HttpMediaTypeNotSupportedException) {
-      return handleInternalException(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+      return handleInternalException(ExceptionCode.UNSUPPORTED_MEDIA_TYPE);
     } else if (ex instanceof HttpMediaTypeNotAcceptableException) {
-      return handleInternalException(HttpStatus.NOT_ACCEPTABLE);
+      return handleInternalException(ExceptionCode.NOT_ACCEPTABLE);
     } else if (ex instanceof MissingPathVariableException) {
-      return handleInternalException(HttpStatus.INTERNAL_SERVER_ERROR);
+      return handleInternalException(ExceptionCode.INTERNAL_SERVER_ERROR);
     } else if (ex instanceof MissingServletRequestParameterException) {
-      return handleInternalException(HttpStatus.BAD_REQUEST);
+      return handleInternalException(ExceptionCode.BAD_REQUEST);
     } else if (ex instanceof ServletRequestBindingException) {
-      return handleInternalException(HttpStatus.BAD_REQUEST);
+      return handleInternalException(ExceptionCode.BAD_REQUEST);
     } else if (ex instanceof ConversionNotSupportedException) {
-      return handleInternalException(HttpStatus.INTERNAL_SERVER_ERROR);
+      return handleInternalException(ExceptionCode.INTERNAL_SERVER_ERROR);
     } else if (ex instanceof TypeMismatchException) {
-      return handleInternalException(HttpStatus.BAD_REQUEST);
+      return handleInternalException(ExceptionCode.BAD_REQUEST);
     } else if (ex instanceof HttpMessageNotReadableException) {
-      return handleInternalException(HttpStatus.BAD_REQUEST);
+      return handleInternalException(ExceptionCode.BAD_REQUEST);
     } else if (ex instanceof HttpMessageNotWritableException) {
-      return handleInternalException(HttpStatus.INTERNAL_SERVER_ERROR);
+      return handleInternalException(ExceptionCode.INTERNAL_SERVER_ERROR);
     } else if (ex instanceof MethodArgumentNotValidException) {
       return handleMethodArgumentNotValidException((MethodArgumentNotValidException) ex);
     } else if (ex instanceof MissingServletRequestPartException) {
-      return handleInternalException(HttpStatus.BAD_REQUEST);
+      return handleInternalException(ExceptionCode.BAD_REQUEST);
     } else if (ex instanceof BindException) {
-      return handleInternalException(HttpStatus.BAD_REQUEST);
+      return handleInternalException(ExceptionCode.BAD_REQUEST);
     } else if (ex instanceof NoHandlerFoundException) {
-      return handleInternalException(HttpStatus.NOT_FOUND);
+      return handleInternalException(ExceptionCode.NOT_FOUND);
     } else if (ex instanceof AsyncRequestTimeoutException) {
-      return handleInternalException(HttpStatus.SERVICE_UNAVAILABLE);
+      return handleInternalException(ExceptionCode.SERVICE_UNAVAILABLE);
     } else {
-      // If exception is an instance of an exception not handle by this method
+      log.error("Unhandled exception of type {}: {}", ex.getClass(), ex);
       throw ex;
     }
   }
@@ -109,8 +122,8 @@ public class BaseController {
    */
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponseDTO> handleException(HttpServletRequest req, Exception ex) {
-    log.error("Sending API error for uncaught exception: {}", ex.getMessage());
-    return new ResponseEntity<>(new ErrorResponseDTO(), HttpStatus.INTERNAL_SERVER_ERROR);
+    log.error("Sending error for uncaught exception: {}", ex);
+    return responseEntityFromErrorResponseDTO(new ErrorResponseDTO());
   }
 
   /**
@@ -123,16 +136,26 @@ public class BaseController {
     BindingResult result = ex.getBindingResult();
     List<FieldError> fieldErrors = result.getFieldErrors();
     ValidationErrorDTO validationErrorDto = new ValidationErrorDTO(fieldErrors);
-    return new ResponseEntity<>(new ErrorResponseDTO(HttpStatus.BAD_REQUEST, VALIDATION_ERROR_CODE, validationErrorDto), HttpStatus.BAD_REQUEST);
+    return responseEntityFromErrorResponseDTO(new ErrorResponseDTO(ExceptionCode.VALIDATION_ERROR, null, validationErrorDto));
   }
 
   /**
    * Handles error and create response from {@link HttpStatus}.
    *
-   * @param status {@link HttpStatus} of response
+   * @param exceptionCode {@link ExceptionCode} exception code
    * @return an API error response
    */
-  private ResponseEntity<ErrorResponseDTO> handleInternalException(HttpStatus status) {
-    return new ResponseEntity<>(new ErrorResponseDTO(status), status);
+  private ResponseEntity<ErrorResponseDTO> handleInternalException(ExceptionCode exceptionCode) {
+    return responseEntityFromErrorResponseDTO(new ErrorResponseDTO(exceptionCode));
+  }
+
+  /**
+   * Creates a response entity from an {@link ErrorResponseDTO} instance.
+   *
+   * @param errorResponseDTO instance of {@link ErrorResponseDTO} to send
+   * @return a {@link ResponseEntity} instance with given {@link ErrorResponseDTO} as body and {@link ExceptionCode} http status.
+   */
+  private ResponseEntity<ErrorResponseDTO> responseEntityFromErrorResponseDTO(ErrorResponseDTO errorResponseDTO) {
+    return new ResponseEntity<>(errorResponseDTO, errorResponseDTO.getCode().getValue());
   }
 }

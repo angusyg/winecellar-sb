@@ -14,9 +14,7 @@
     <description>Winecellar WebApp Server</description>
 
     <modules>
-        <module>winecellar-model</module>
         <module>winecellar-core</module>
-        <module>winecellar-auth</module>
         <module>winecellar-webapp</module>
     </modules>
 

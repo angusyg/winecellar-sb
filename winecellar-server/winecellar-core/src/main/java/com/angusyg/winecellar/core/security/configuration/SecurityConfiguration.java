@@ -1,6 +1,5 @@
 package com.angusyg.winecellar.core.security.configuration;
 
-import com.angusyg.winecellar.core.security.jwt.filter.CustomBasicAuthenticationEntryPoint;
 import com.angusyg.winecellar.core.security.jwt.filter.JwtTokenAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -25,7 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
     jsr250Enabled = true)
 public class SecurityConfiguration {
   @Bean
-  public BCryptPasswordEncoder passwordEncoder() {
+  public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 

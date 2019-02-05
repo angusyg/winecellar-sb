@@ -21,7 +21,7 @@ public class I18nConfiguration {
    * @return an instance of {@link MessageSource}
    */
   @Bean
-  public MessageSource getMessageSource() {
+  public MessageSource messageSource() {
     return new ClasspathReloadableResourceBundleMessageSource();
   }
 
@@ -32,7 +32,7 @@ public class I18nConfiguration {
    * @return an instance of {@link MessageSourceAccessor}
    */
   @Bean
-  public MessageSourceAccessor getMessageSourceAccessor() {
-    return new MessageSourceAccessor(getMessageSource());
+  public MessageSourceAccessor messageSourceAccessor() {
+    return new MessageSourceAccessor(messageSource());
   }
 }
