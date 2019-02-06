@@ -13,7 +13,7 @@ import java.util.Set;
  */
 @Data
 @NoArgsConstructor
-public class UserDto {
+public class UserDTO {
   // User id
   private Long id;
   // User name

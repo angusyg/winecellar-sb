@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -46,7 +47,7 @@ public class BaseController {
    */
   @ExceptionHandler(ApiException.class)
   public ResponseEntity<ErrorResponseDTO> handleApiException(HttpServletRequest req, ApiException ex) {
-    log.error("Sending error for API Exception: {}", ex);
+    log.error("Sending error for API Exception: {}", ex.getMessage(), ex);
     return responseEntityFromErrorResponseDTO(new ErrorResponseDTO(ex));
   }
 
@@ -73,10 +74,11 @@ public class BaseController {
       MissingServletRequestPartException.class,
       BindException.class,
       NoHandlerFoundException.class,
-      AsyncRequestTimeoutException.class
+      AsyncRequestTimeoutException.class,
+      AccessDeniedException.class
   })
   public ResponseEntity<ErrorResponseDTO> handleCommonExceptions(Exception ex, HttpServletRequest request) throws Exception {
-    log.error("Sending error for {} exception: {}", ex.getClass(), ex);
+    log.error("Sending error for {} exception: {}", ex.getClass(), ex.getMessage(), ex);
     if (ex instanceof HttpRequestMethodNotSupportedException) {
       return handleInternalException(ExceptionCode.METHOD_NOT_ALLOWED);
     } else if (ex instanceof HttpMediaTypeNotSupportedException) {
@@ -107,8 +109,10 @@ public class BaseController {
       return handleInternalException(ExceptionCode.NOT_FOUND);
     } else if (ex instanceof AsyncRequestTimeoutException) {
       return handleInternalException(ExceptionCode.SERVICE_UNAVAILABLE);
+    } else if(ex instanceof  AccessDeniedException) {
+      return handleInternalException(ExceptionCode.FORBIDDEN);
     } else {
-      log.error("Unhandled exception of type {}: {}", ex.getClass(), ex);
+      log.error("Unhandled exception of type {}: {}", ex.getClass(), ex.getMessage(), ex);
       throw ex;
     }
   }
@@ -122,7 +126,7 @@ public class BaseController {
    */
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponseDTO> handleException(HttpServletRequest req, Exception ex) {
-    log.error("Sending error for uncaught exception: {}", ex);
+    log.error("Sending error for uncaught exception: {}", ex.getMessage(), ex);
     return responseEntityFromErrorResponseDTO(new ErrorResponseDTO());
   }
 

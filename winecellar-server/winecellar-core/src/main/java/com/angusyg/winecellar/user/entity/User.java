@@ -75,20 +75,40 @@ public class User implements UserDetails {
     this.accountNonLocked = true;
     this.credentialsNonExpired = true;
     this.enabled = true;
-    this.roles = new HashSet<>(Arrays.asList(Role.USER));
+    this.roles = new HashSet<>(Arrays.asList(Role.ROLE_USER));
   }
 
   /**
-   * Creates on a instance of {@link User} with given username, password and email
+   * Creates on a instance of {@link User} with given username,
+   * password and email and default role (USER).
+   *
    * @param username user name
    * @param password user password
-   * @param email user email
+   * @param email    user email
    */
   public User(String username, String password, String email) {
     this();
     this.username = username;
     this.password = password;
     this.email = email;
+    this.roles = new HashSet<>(Arrays.asList(Role.ROLE_USER));
+  }
+
+  /**
+   * Creates on a instance of {@link User} with given username,
+   * password and email and roles.
+   *
+   * @param username user name
+   * @param password user password
+   * @param email    user email
+   * @param roles    user roles
+   */
+  public User(String username, String password, String email, HashSet<Role> roles) {
+    this();
+    this.username = username;
+    this.password = password;
+    this.email = email;
+    this.roles = roles;
   }
 
   /**
@@ -113,6 +133,7 @@ public class User implements UserDetails {
             .map(Enum::name)
             .collect(Collectors.toList()));
   }
+
   /**
    * Returns user authorities from user roles.
    *

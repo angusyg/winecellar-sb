@@ -6,6 +6,6 @@ package com.angusyg.winecellar.user.config;
  * @since 0.0.1
  */
 public enum Role {
-  USER,
-  ADMIN
+  ROLE_USER,
+  ROLE_ADMIN
 }

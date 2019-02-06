@@ -4,7 +4,7 @@ import com.angusyg.winecellar.core.exception.ApiException;
 import com.angusyg.winecellar.core.exception.ExceptionCode;
 
 /**
- * Exception throw when data is duplicated in repository.
+ * Exception thrown when data is duplicated in repository.
  *
  * @since 0.0.1
  */

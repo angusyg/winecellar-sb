@@ -1,10 +1,9 @@
 package com.angusyg.winecellar.core.security.jwt.util;
 
-import com.angusyg.winecellar.core.security.jwt.JwtTokenPayload;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.angusyg.winecellar.core.exception.ApiException;
+import com.angusyg.winecellar.core.exception.ExceptionCode;
+import com.angusyg.winecellar.core.security.jwt.dto.JwtTokenPayloadDTO;
+import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,59 +16,64 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class JwtUtils {
+  // User payload id key name
+  private static final String USER_ID_KEY = "userId";
+  // User payload authorities key name
+  private static final String AUTHORITIES_KEY = "authorities";
   // JWT secret to sign token
   @Value("${security.jwt.secret}")
   private String secret;
 
-  // User payload id key name
-  private static final String USER_ID_KEY = "userId";
-
-  // User payload roles key name
-  private static final String ROLE_KEY = "roles";
-
   /**
-   * Tries to parse specified String as a JWT token.
+   * Try to parse specified String as a JWT token.
    * If successful, returns user payload.
    * If unsuccessful (token is invalid or not containing all required user properties), simply returns null.
    *
    * @param token the JWT token to parse
    * @return the User object extracted from specified token or null if a token is invalid.
+   * @throws ApiException when an error occurred while parsing token
    */
-  public JwtTokenPayload parseToken(String token) {
+  public JwtTokenPayloadDTO parseToken(String token) throws ApiException {
     try {
-      // Decodes token
+      // Decode token
       Claims body = Jwts.parser()
           .setSigningKey(secret)
           .parseClaimsJws(token)
           .getBody();
-
-      // Creates payload form decoded token body
-      JwtTokenPayload jwtTokenPayload = new JwtTokenPayload();
-      jwtTokenPayload.setUsername(body.getSubject());
-      jwtTokenPayload.setId((String) body.get(USER_ID_KEY));
-      jwtTokenPayload.setRoles((String) body.get(ROLE_KEY));
-
-      return jwtTokenPayload;
-    } catch (JwtException | ClassCastException ex) {
-      log.error("Exception while decoding JWT Token: {}", ex.getMessage());
+      // Create payload form decoded token body
+      JwtTokenPayloadDTO jwtTokenPayloadDTO = new JwtTokenPayloadDTO();
+      jwtTokenPayloadDTO.setUsername(body.getSubject());
+      jwtTokenPayloadDTO.setId((String) body.get(USER_ID_KEY));
+      jwtTokenPayloadDTO.setAuthorities((String) body.get(AUTHORITIES_KEY));
+      return jwtTokenPayloadDTO;
+    } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException ex) {
+      log.error("Exception while decoding JWT Token: {}", ex.getMessage(), ex);
+      if (ex instanceof ExpiredJwtException) {
+        throw new ApiException(ExceptionCode.EXPIRED_JWT_TOKEN);
+      } else if(ex instanceof UnsupportedJwtException) {
+        throw new ApiException(ExceptionCode.UNSUPPORTED_JWT_TOKEN);
+      } else if(ex instanceof MalformedJwtException) {
+        throw new ApiException(ExceptionCode.MALFORMED_JWT_TOKEN);
+      } else if(ex instanceof SignatureException) {
+        throw new ApiException(ExceptionCode.SIGNATURE_JWT_TOKEN);
+      }
       return null;
     }
   }
 
   /**
-   * Generates a JWT token containing username as subject and additional claims.
+   * Generate a JWT token containing username as subject and additional claims.
    * These properties are taken from a specified payload.
    *
    * @param payload the user payload
    * @return the JWT token
    */
-  public String generateToken(JwtTokenPayload payload) {
-    // Creates token body
+  public String generateToken(JwtTokenPayloadDTO payload) {
+    // Create token body
     Claims claims = Jwts.claims().setSubject(payload.getUsername());
     claims.put(USER_ID_KEY, payload.getId() + "");
-    claims.put(ROLE_KEY, payload.getRoles());
-
-    // Encodes and signs token
+    claims.put(AUTHORITIES_KEY, payload.getAuthorities());
+    // Encode and sign token
     return Jwts.builder()
         .setClaims(claims)
         .signWith(SignatureAlgorithm.HS512, secret)

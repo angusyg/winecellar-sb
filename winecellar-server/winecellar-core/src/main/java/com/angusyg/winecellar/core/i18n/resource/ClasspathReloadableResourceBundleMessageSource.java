@@ -77,7 +77,7 @@ public class ClasspathReloadableResourceBundleMessageSource extends ReloadableRe
       }
     } catch (IOException ex) {
       // Error during refresh
-      log.warn("Error during properties refresh: {}", ex.getMessage());
+      log.warn("Error during properties refresh: {}", ex.getMessage(), ex.getMessage());
     }
     return new PropertiesHolder(properties, lastModified);
   }

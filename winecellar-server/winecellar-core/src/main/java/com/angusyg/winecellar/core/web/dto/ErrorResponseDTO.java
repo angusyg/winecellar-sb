@@ -26,7 +26,7 @@ public class ErrorResponseDTO {
    * Creates an {@link ErrorResponseDTO} instance with default error code.
    */
   public ErrorResponseDTO() {
-    this.code = ExceptionCode.INTERNAl_ERROR;
+    this.code = ExceptionCode.INTERNAL_ERROR;
   }
 
   /**
@@ -74,7 +74,7 @@ public class ErrorResponseDTO {
       this.code = ((ApiException) ex).getCode();
       this.message = ex.getMessage();
     } else {
-      this.code = ExceptionCode.INTERNAl_ERROR;
+      this.code = ExceptionCode.INTERNAL_ERROR;
     }
   }
 

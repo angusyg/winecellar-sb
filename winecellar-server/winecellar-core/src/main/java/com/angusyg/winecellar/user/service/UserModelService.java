@@ -20,7 +20,7 @@ public class UserModelService extends ModelService<User, Long> {
     u.setEmail("mail@email.com");
     u.setUsername("admin");
     u.setPassword("$2a$10$Qb2co9k7ADlXaOHdenIPbuOBVdJStqsgF3bR5k7yzYqFMgnHMIxDW");
-    u.setRoles("USER,ADMIN");
+    u.setRoles("ROLE_USER,ROLE_ADMIN");
     repository.save(u);
   }
 }

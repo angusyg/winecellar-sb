@@ -1,79 +1,68 @@
 package com.angusyg.winecellar.core.security.jwt.filter;
 
-import com.angusyg.winecellar.core.security.configuration.JwtConfiguration;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import com.angusyg.winecellar.core.exception.ApiException;
+import com.angusyg.winecellar.core.security.jwt.configuration.JwtConfiguration;
+import com.angusyg.winecellar.core.security.jwt.dto.JwtTokenPayloadDTO;
+import com.angusyg.winecellar.core.security.jwt.util.JwtUtils;
+import com.angusyg.winecellar.core.web.filter.ApiOncePerRequestFilter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
-public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
+/**
+ * Filter to auto authenticate user if a valid JWT Token is found in request header.
+ *
+ * @since 0.0.1
+ */
+@Component
+public class JwtTokenAuthenticationFilter extends ApiOncePerRequestFilter {
+  // JWT security configuration
   private JwtConfiguration jwtConfiguration;
 
-  public JwtTokenAuthenticationFilter(JwtConfiguration jwtConfiguration) {
+  // Util for JWT Token operations
+  private JwtUtils jwtUtils;
+
+  /**
+   * Creates an instance of {@link JwtTokenAuthenticationFilter}
+   *
+   * @param jwtConfiguration
+   * @param jwtUtils
+   */
+  public JwtTokenAuthenticationFilter(JwtConfiguration jwtConfiguration, JwtUtils jwtUtils) {
     this.jwtConfiguration = jwtConfiguration;
+    this.jwtUtils = jwtUtils;
   }
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-
-    // 1. get the authentication header. Tokens are supposed to be passed in the authentication header
+    // Get the authentication header where tokens are supposed to be passed.
     String header = request.getHeader(jwtConfiguration.getHeader());
-
-    // 2. validate the header and check the prefix
+    // If authorization header is not found or prefix value is not the one expected, go to the next filter.
     if (header == null || !header.startsWith(jwtConfiguration.getPrefix())) {
-      chain.doFilter(request, response);        // If not valid, go to the next filter.
+      chain.doFilter(request, response);
     } else {
-      // If there is no token provided and hence the user won't be authenticated.
-      // It's Ok. Maybe the user accessing a public path or asking for a token.
-
-      // All secured paths that needs a token are already defined and secured in config class.
-      // And If user tried to access without access token, then he won't be authenticated and an exception will be thrown.
-
-      // 3. Get the token
+      // Get the token value from header and remove prefix from it.
       String token = header.replace(jwtConfiguration.getPrefix(), "");
-
-      try {    // exceptions might be thrown in creating the claims if for example the token is expired
-
-        // 4. Validate the token
-        Claims claims = Jwts.parser()
-            .setSigningKey(jwtConfiguration.getSecret().getBytes())
-            .parseClaimsJws(token)
-            .getBody();
-
-        String username = claims.getSubject();
-        if (username != null) {
-          List<String> authorities = (List<String>) claims.get("authorities");
-
-          // 5. Create auth object
-          // UsernamePasswordAuthenticationToken: A built-in object, used by spring to represent the current authenticated / being authenticated user.
-          // It needs a list of authorities, which has type of GrantedAuthority interface, where SimpleGrantedAuthority is an implementation of that interface
-          UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null, authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
-
-          // 6. Authenticate the user
-          // Now, user is authenticated
-          SecurityContextHolder.getContext().setAuthentication(auth);
-        }
-
-      } catch (Exception e) {
-        // In case of failure. Make sure it's clear; so guarantee user won't be authenticated
+      try {
+        // Validate the token and extracts its payload.
+        JwtTokenPayloadDTO payload = jwtUtils.parseToken(token);
+        // Create auth object.
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(payload.getUsername(), null, AuthorityUtils.commaSeparatedStringToAuthorityList(payload.getAuthorities()));
+        // Authenticate the user.
+        SecurityContextHolder.getContext().setAuthentication(auth);
+      } catch (ApiException e) {
+        // In case of failure. Make sure it's clear; so guarantee user won't be authenticated.
         SecurityContextHolder.clearContext();
       }
-
-      // go to the next filter in the filter chain
+      // Go to the next filter.
       chain.doFilter(request, response);
     }
-
-
   }
-
 }

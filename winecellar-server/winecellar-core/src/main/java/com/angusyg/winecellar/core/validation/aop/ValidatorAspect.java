@@ -31,21 +31,36 @@ public class ValidatorAspect {
   public void beanAnnotatedWithService() {
   }
 
+  // Pointcut on all methods within annotated class with @Validated
+  @Pointcut("within(@org.springframework.validation.annotation.Validated *)")
+  public void beanAnnotatedWithValidated() {
+  }
+
+  @Pointcut("beanAnnotatedWithService() && beanAnnotatedWithValidated()")
+  public void beanAnnotatedWithServiceAndValidated() {
+  }
+
   /**
-   * Validates all method arguments of method
+   * Validates all method arguments of method in classes annotated with @Service and @Validated
    *
    * @param joinPoint method invocation
    * @throws {@link IllegalArgumentException} when a method argument validation failed
    */
-  @Before("beanAnnotatedWithService()")
+  @Before("beanAnnotatedWithServiceAndValidated()")
   private void validateArguments(JoinPoint joinPoint) {
+    // For each argument of method
     for (int i = 0; i < joinPoint.getArgs().length; i++) {
+      // Get argument
       Object arg = joinPoint.getArgs()[i];
+      // Validate argument
       Set<ConstraintViolation<Object>> result = validator.validate(arg);
       if (!result.isEmpty()) {
+        // Validation failed
         for (ConstraintViolation<Object> cv : result) {
+          // Log validation violation
           log.error(String.format(VALIDATION_FAILURE_MESSAGE, joinPoint.getSignature(), i, arg.getClass(), cv.toString()));
         }
+        // Throw validation exception
         throw new IllegalArgumentException(String.format("%s is not valid", arg.getClass()));
       }
     }

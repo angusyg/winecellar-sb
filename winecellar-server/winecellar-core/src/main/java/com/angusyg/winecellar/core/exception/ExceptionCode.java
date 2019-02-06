@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
  * @since 0.0.1
  */
 public enum ExceptionCode {
-  INTERNAl_ERROR(HttpStatus.INTERNAL_SERVER_ERROR),
+  INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR),
 
   // Standards http errors
   METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED),
@@ -23,6 +23,13 @@ public enum ExceptionCode {
   // Auth errors
   BAD_CREDENTIALS_USERNAME(HttpStatus.UNAUTHORIZED),
   BAD_CREDENTIALS_PASSWORD(HttpStatus.UNAUTHORIZED),
+  MISSING_JWT_TOKEN(HttpStatus.UNAUTHORIZED),
+  EXPIRED_JWT_TOKEN(HttpStatus.UNAUTHORIZED),
+  UNSUPPORTED_JWT_TOKEN(HttpStatus.UNAUTHORIZED),
+  MALFORMED_JWT_TOKEN(HttpStatus.UNAUTHORIZED),
+  SIGNATURE_JWT_TOKEN(HttpStatus.UNAUTHORIZED),
+  UNAUTHORIZED(HttpStatus.UNAUTHORIZED),
+  FORBIDDEN(HttpStatus.FORBIDDEN),
 
   // Validation errors
   VALIDATION_ERROR(HttpStatus.BAD_REQUEST),

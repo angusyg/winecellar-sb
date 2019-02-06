@@ -1,4 +1,4 @@
-package com.angusyg.winecellar.core.security.jwt;
+package com.angusyg.winecellar.core.security.jwt.dto;
 
 import lombok.Data;
 
@@ -8,8 +8,8 @@ import lombok.Data;
  * @since 0.0.1
  */
 @Data
-public class JwtTokenPayload {
+public class JwtTokenPayloadDTO {
   private String id;
   private String username;
-  private String roles;
+  private String authorities;
 }
